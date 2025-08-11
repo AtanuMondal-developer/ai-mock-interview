@@ -89,20 +89,47 @@ export const RecordAnswer = ({
     }
   };
 
-  const cleanJsonResponse = (responseText: string) => {
-    // Step 1: Trim any surrounding whitespace
-    let cleanText = responseText.trim();
+  // const cleanJsonResponse = (responseText: string) => {
+  //   // Step 1: Trim any surrounding whitespace
+  //   let cleanText = responseText.trim();
 
-    // Step 2: Remove any occurrences of "json" or code block symbols (``` or `)
-    cleanText = cleanText.replace(/(json|```|`)/g, "");
+  //   // Step 2: Remove any occurrences of "json" or code block symbols (``` or `)
+  //   cleanText = cleanText.replace(/(json|```|`)/g, "");
 
-    // Step 3: Parse the clean JSON text into an array of objects
-    try {
-      return JSON.parse(cleanText);
-    } catch (error) {
-      throw new Error("Invalid JSON format: " + (error as Error)?.message);
-    }
-  };
+  //   // Step 3: Parse the clean JSON text into an array of objects
+  //   try {
+  //     return JSON.parse(cleanText);
+  //   } catch (error) {
+  //     throw new Error("Invalid JSON format: " + (error as Error)?.message);
+  //   }
+  // };
+  // ...existing code...
+
+// Replace your cleanJsonResponse function with this improved version:
+const cleanJsonResponse = (responseText: string) => {
+  // Trim whitespace
+  let cleanText = responseText.trim();
+
+  // Remove code block symbols and "json"
+  cleanText = cleanText.replace(/(json|```|`)/gi, "");
+
+  // Remove control characters (except newline and tab)
+  cleanText = cleanText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+
+  // Optionally, try to extract JSON from the response using a regex
+  const match = cleanText.match(/{[\s\S]*}/);
+  if (match) {
+    cleanText = match[0];
+  }
+
+  try {
+    return JSON.parse(cleanText);
+  } catch (error) {
+    throw new Error("Invalid JSON format: " + (error as Error)?.message);
+  }
+};
+
+// ...existing code...
 
   const generateResult = async (
     qst: string,
